@@ -1,0 +1,18 @@
+// File: favoritesport.hla
+// Stewart Dulaney
+// The purpose of this program is to display my favorite sport on screen in large letters
+// Input: none
+// Output: Name of favorite sport in large letters that are each composed of characters of that letter
+
+program favoritesport;
+	#include( "stdlib.hhf" );
+
+begin favoritesport;
+	// Print five lines of text containing varied numbers of the characters in "BASKETBALL!" with varied spacing such that they form the same word in large letters when outputted consecutively
+	stdout.put( "BBB    A    SSSS K  K EEEEE TTTTT BBB    A   L     L     !", nl );
+	stdout.put( "B  B  A A  S     K K  E       T   B  B  A A  L     L     !", nl );
+	stdout.put( "BBB  AAAAA SSSS  KK   EEE     T   BBB  AAAAA L     L     !", nl );
+	stdout.put( "B  B A   A     S K K  E       T   B  B A   A L     L     !", nl );
+	stdout.put( "BBB  A   A SSSS  K  K EEEEE   T   BBB  A   A LLLLL LLLLL !", nl );
+
+end favoritesport;

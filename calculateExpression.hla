@@ -1,0 +1,17 @@
+// File: calculateExpression.hla
+
+// Calculate expression(n) := 73n***3 + 16n - 1
+finit();
+fld(n);		// Load n
+fld(st0);	// Duplicate n on TOS
+fmul();         // Compute n**2
+fld(n);		// Load n
+fmul();         // Compute n***3
+fld(x);		// Load 73
+fmul();		// Complete 73n***3
+fld(n);		// Load n
+fld(y);		// Load 16
+fmul();		// Compute 16n
+fadd();		// Compute 73n***3 + 16n
+fld(z);		// Load 1
+fsub();		// Compute 73n***3 + 16n - 1

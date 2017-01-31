@@ -1,0 +1,100 @@
+program StringProgram;
+#include( "stdlib.hhf" );
+// Place the string.hla file in the same folder as the hla file you are working on
+#include( "string.hla" );
+static
+	stringData : dword;
+
+procedure isAllLowerCase( stringData : dword ); @nodisplay; @noframe;
+static
+	dReturnAddress : dword;
+	dEBXRegister : dword := 0;   // preserve EBX
+  	dECXRegister : dword := 0;   // preserve ECX
+  	dEDXRegister : dword := 0;   // preserve EDX
+
+begin isAllLowerCase;
+	// entry sequence
+	// preserve registers used
+	mov( EDX, dEDXRegister );
+	mov( ECX, dECXRegister );
+	mov( EBX, dEBXRegister );
+	pop( dReturnAddress );
+	// this is the return address
+	pop( stringData );
+	// push back the return address
+	push( dReturnAddress );
+	// preserve registers
+	push( dEDXRegister );
+	push( dECXRegister );
+	push( dEBXRegister );
+
+	// begin subtask
+	mov( 1, EAX );				// bool result = true;
+	mov( stringData, EBX );			// EBX is address of stringData[I]
+
+	WhileLp:
+	WhileLpTermination:
+		mov( (type char [EBX]), CL );
+		mov( 0, DL );
+		cmp( CL, DL );			// while ( stringData[ i ] != NULL )
+		je WhileLpDone;
+	WhileLpBody:
+		mov( (type char [EBX]), CL );
+		mov( 122, DL );			// uppercase letters are ASCII(97) thru ASCII(122)
+		cmp( CL, DL );
+		jg ReturnFalse;
+		mov( 97, DL );
+		cmp( CL, DL );
+		jl ReturnFalse;
+		inc( EBX );
+		jmp WhileLp;
+
+		ReturnFalse:
+			mov( 0, EAX );
+			jmp WhileLpDone;
+     	WhileLpDone:
+
+	// restore the registers used
+	pop( EBX );
+  	pop( ECX );
+  	pop( EDX );
+	ret();
+
+end isAllLowerCase;
+
+begin StringProgram;
+	stdout.put( "Please enter a string to process", nl );
+	// this code prompts for a length and allocates a string that size
+	mov( @size( int8 ), AL );
+	mov( 80, BL );
+	inc( BL );
+	mul( BL );
+	mov( 0, EBX );
+	mov( AX, BX );
+	malloc( EBX );
+	mov( EAX, stringData );
+	// let's try reading a value into the string
+	mov( stringData, EBX );
+	push( EBX );
+	mov( 80, CX );
+	push( CX );
+	call gets;
+
+	// print the string
+	stdout.put( "----> here is the string you entered: " );
+	mov( stringData, EBX );
+	push( EBX );
+	call puts;
+	stdout.newln();
+	// initialize EAX before calling the function.
+	mov( 0, EAX );
+	// send a string parameter to the function
+	push( stringData );
+
+	call isAllLowerCase;
+	// show the results
+	stdout.put( "result=" );
+	stdout.puti32( EAX );
+	stdout.newln();
+
+end StringProgram;

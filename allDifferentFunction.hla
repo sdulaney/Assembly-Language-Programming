@@ -1,0 +1,91 @@
+// File: allDifferentFunction.hla
+// Stewart Dulaney
+// The purpose of this program is to identify whether all the parameters are different
+// Input: three 16 bit integers x, y, and z
+// Output: true or false depending on whether the condition has been met
+
+program allDifferentFunction;
+#include( "stdlib.hhf" );
+static
+	iDataValue1 : int16 := 0;
+	iDataValue2 : int16 := 0;
+	iDataValue3 : int16 := 0;
+
+// Function allDifferent
+procedure allDifferent( x: int16; y : int16; z : int16 ); @nodisplay; @noframe;
+static
+	returnAddress : dword;
+	temp: int16;
+
+// This procedure returns its answer in EAX, so we don't need to save that register
+// No other register is used, so no other registers need to be saved
+begin allDifferent;
+// Get parameters from stack
+	pop(returnAddress);
+	pop(temp);			// this is junk to align the stack
+	pop(z);				// this is z
+	pop(y);				// this is y
+	pop(x);				// this is x
+	push(returnAddress);
+
+	mov(y, AX);
+	cmp(x, AX);			// if x=y, return false =0
+	je ReturnFalse;
+
+	mov(z, AX);
+	cmp(x, AX);			// if x=z, return false =0
+	je ReturnFalse;
+
+	cmp(y, AX);			// if y=z, return false =0
+	je ReturnFalse;
+	jmp ReturnTrue;			// else return true =1
+
+	ReturnTrue:
+		mov(1, EAX);		//return true
+		jmp ExitSequence;
+
+	ReturnFalse:
+		mov(0, EAX);		//return false
+		jmp ExitSequence;
+
+	ExitSequence:
+	ret();
+
+end allDifferent;
+
+// Main program
+begin allDifferentFunction;
+
+	stdout.put("Feed Me X: ");
+	stdin.get(iDataValue1);
+	stdout.put("Feed Me Y: ");
+	stdin.get(iDataValue2);
+	stdout.put("Feed Me Z: ");
+	stdin.get(iDataValue3);
+
+	push(iDataValue1);
+	push(iDataValue2);
+	push(iDataValue3);
+	// not even multiples of 32-bits pushed onto stack
+	// so I am pushing one last piece of junk
+	mov(0, AX);
+	push(AX);
+
+	call allDifferent;
+	// this function leaves the answer in EAX
+
+	cmp(EAX, 1);
+	je AllAreDifferent;
+	jmp AllAreNotDifferent;
+
+	AllAreDifferent:
+		stdout.put("allDifferent returns true!", nl);
+		jmp EndProgram;
+
+	AllAreNotDifferent:
+		stdout.put("allDifferent returns false!", nl);
+		jmp EndProgram;
+
+	EndProgram:
+
+end allDifferentFunction;

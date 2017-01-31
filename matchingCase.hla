@@ -1,0 +1,81 @@
+// File: matchingCase.hla
+// Stewart Dulaney
+// The purpose of this program is to implement a function that tests to see if two characters have matching case
+// Input: two characters
+// Output: message displaying true or false depending on whether the letters have the same case
+
+program matchingCase;
+#include( "stdlib.hhf" );
+static
+	cMyCharacter1 : byte := 0;
+	cMyCharacter2 : byte := 0;
+
+// Procedure hasMatchingCase
+procedure hasMatchingCase( aLetter : byte; otherLetter: byte ); @nodisplay; @noframe;
+static
+	iReturnAddress : dword;
+	iTemporary : word;
+
+begin hasMatchingCase;
+	// entry sequence
+	pop( iReturnAddress );
+	// acquire parameters on the stack
+	pop( iTemporary );       		// this is otherLetter
+	mov( iTemporary, AX );
+	mov( AL, otherLetter );
+	pop( iTemporary );       		// this is aLetter
+	mov( iTemporary, AX );
+	mov( AL, aLetter );
+	push( iReturnAddress );
+	// preserve registers --- NONE
+
+	// perform subtask
+	and( %0010_0000, aLetter );		// mask out all bits but bit position five
+	and( %0010_0000, otherLetter );
+	mov( otherLetter, AL );
+	cmp( aLetter, AL );
+	je SameCase;
+	jne DifferentCase;
+
+	SameCase:
+		mov( 1, AX );			//return true
+		jmp ExitSequence;
+	DifferentCase:
+		mov( 0, AX );			//return false
+		jmp ExitSequence;
+	ExitSequence:
+	ret();
+end hasMatchingCase;
+
+// Main program
+begin matchingCase;
+
+	stdout.put( "Feed Me: " );
+	stdin.flushInput();
+	stdin.getc();
+	mov(AL, cMyCharacter1);
+	mov(0, AX);
+	mov(cMyCharacter1, AL);
+	push(AX);
+	stdout.put( "Feed Me: " );
+	stdin.flushInput();
+	stdin.getc();
+	mov(AL, cMyCharacter2);
+	mov(0, AX);
+	mov(cMyCharacter2, AL);
+	push(AX);
+
+	call hasMatchingCase;
+	// this function leaves the answer in AX
+	cmp(AX, 1);
+	je TrueMessage;
+	jne FalseMessage;
+
+	TrueMessage:
+		stdout.put("matchingCase returns true", nl);
+		jmp EndProgram;
+	FalseMessage:
+		stdout.put("matchingCase returns false", nl);
+		jmp EndProgram;
+	EndProgram:
+end matchingCase;

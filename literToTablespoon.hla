@@ -1,0 +1,28 @@
+// File: literToTablespoon.hla
+// Stewart Dulaney
+// The purpose of this program is to convert a number of liters into the equivalent number of tablespoons
+// Input: Liters amount
+// Output: Tablespoons amount
+
+program literToTablespoon;
+#include( "stdlib.hhf" );
+static
+    x : real32;
+    y : real32:= 67.628;
+    z : real32;
+begin literToTablespoon;
+  stdout.put ("Liter: ");
+  stdin.get( x );
+
+  // Compute Z := x**y;
+  finit();
+  fld( x );              // Load X.
+  fld( y );              // Load Y on TOS.
+  fmul();                // Compute X**Y.
+  fstp( z );             // Store result away into Z.
+
+  stdout.put( "Converted into tablespoons, that is: " );
+  stdout.putr32( z, 10, 3);
+  stdout.put( nl );
+
+end literToTablespoon;

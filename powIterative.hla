@@ -1,0 +1,91 @@
+program powIterative;
+#include( "stdlib.hhf" );
+static
+	iDataValue1 : int8 := 0;
+	iDataValue2 : int8 := 0;
+	I : int8 := 0;
+	J : int32 := 0;
+	iTemporary : int32 := 0;
+	R : int32 := 1;
+
+// Function pow
+procedure pow( x: int8; y: int8 ); @nodisplay; @noframe;
+static
+	returnAddress : dword;
+	temp: int16;
+	iRegisterValue : dword;
+
+begin pow;
+	// Preserve registers
+	mov( EAX, iRegisterValue );
+	// Get parameters from stack
+	pop(returnAddress);
+	pop(temp);			// this is y
+	mov( temp, AX );
+	mov( AL, y );
+	pop(temp);			// this is x
+	mov( temp, AX );
+	mov( AL, x );
+	push(returnAddress);
+	// Preserve registers
+	push( iRegisterValue );
+
+	ForLp1:
+	InitializeForLp1:	// I = 1
+		mov(1, I);
+	ForLp1TerminationTest:	// is I > y? then terminate for
+		mov(y, AL);
+		cmp(I, AL);
+		ja ForLp1Done;
+	ForLp1Body:
+		// R = R * x;
+		mov( R, iTemporary );
+		ForLp2:
+		InitializeForLp2:		// J = 1
+			mov(1, J);
+		ForLp2TerminationTest:		// is J > (x-1)? then terminate for
+			mov( 0, EAX );
+			mov( x, AL );
+			dec( EAX );
+			cmp(J, EAX );
+			ja ForLp2Done;
+		ForLp2Body:
+			mov( iTemporary, EAX );
+			add( EAX, R );
+		ForLp2Increment:
+			inc(J);
+			jmp ForLp2TerminationTest;
+		ForLp2Done:
+	ForLp1Increment:
+		inc(I);
+		jmp ForLp1TerminationTest;
+	ForLp1Done:
+
+	// Pop preserved registers
+	pop( EAX );
+	ret();
+
+end pow;
+
+// Main program
+begin powIterative;
+
+	stdout.put("Gimme an x: ");
+	stdin.get(iDataValue1);
+	stdout.put("Gimme a y: ");
+	stdin.get(iDataValue2);
+
+	mov( 0, AX );
+	mov( iDataValue1, AL );
+	push( AX );
+	mov( 0, AX );
+	mov( iDataValue2, AL );
+	push( AX );
+
+	call pow;
+	// this function leaves the answer in R
+
+	stdout.put(R);
+	stdout.put( nl );
+
+end powIterative;

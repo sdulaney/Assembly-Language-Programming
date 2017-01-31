@@ -1,0 +1,83 @@
+program powRecursive;
+#include( "stdlib.hhf" );
+static
+	iDataValue1 : int8 := 0;
+	iDataValue2 : int8 := 0;
+
+// Function powRec
+procedure powRec( x: int8; y: int8 ); @nodisplay; @noframe;
+static
+	returnAddress : dword;
+	temp: int16;
+	iRegisterValue : dword;
+
+begin powRec;
+	// Preserve registers
+	mov( EBX, iRegisterValue );
+	// Get parameters from stack
+	pop(returnAddress);
+	pop(temp);			// this is y
+	mov( temp, AX );
+	mov( AL, y );
+	pop(temp);			// this is x
+	mov( temp, AX );
+	mov( AL, x );
+	push(returnAddress);
+	// Preserve registers
+	push( iRegisterValue );
+
+	cmp(y, 1);
+	je ReturnX;			// if y=1, return result =x
+
+	jmp YisNotOne;			// else return result = x * powRec( x, y-1 );
+
+	ReturnX:
+		mov( 0, EAX );
+		mov( x, AL );
+		jmp ExitSequence;
+
+	YisNotOne:
+		// result = x * powRec(x, y-1);
+		mov( 0, BX );
+		mov( x, BL );
+		push( BX );
+		sub( 1, y );		// y-1
+		mov( 0, BX );
+		mov( y, BL );
+		push( BX );
+		call powRec;
+
+		mov( 0, EBX );
+		mov( x, BL );
+		imul( EBX );
+		jmp ExitSequence;
+	ExitSequence:
+
+	// Pop preserved registers
+	pop( EBX );
+	ret();
+
+end powRec;
+
+// Main program
+begin powRecursive;
+
+	stdout.put("Gimme an x: ");
+	stdin.get(iDataValue1);
+	stdout.put("Gimme a y: ");
+	stdin.get(iDataValue2);
+
+	mov( 0, AX );
+	mov( iDataValue1, AL );
+	push( AX );
+	mov( 0, AX );
+	mov( iDataValue2, AL );
+	push( AX );
+
+	call powRec;
+	// this function leaves the answer in EAX
+
+	stdout.puti32(EAX);
+	stdout.put( nl );
+
+end powRecursive;

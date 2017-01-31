@@ -1,0 +1,76 @@
+program ReferenceProgram;
+#include( "stdlib.hhf" );
+static
+	iValue1 : int16 := 0;
+	iValue2 : int16 := 0;
+
+procedure makeBiggest( var i : int16; var j : int16 );@nodisplay; @noframe;
+static
+	dReturnAddress : dword;
+	iVariable : int16;
+	jVariable : int16;
+	dEDXRegister : dword := 0; // preserve EDX
+	dECXRegister : dword := 0; // preserve ECX
+	dEBXRegister : dword := 0; // preserve EBX
+	dEAXRegister : dword := 0; // preserve EAX
+
+begin makeBiggest;
+	// entry sequence
+	// preserve registers used
+	mov( EAX, dEAXRegister );
+	mov( EBX, dEBXRegister );
+	mov( ECX, dECXRegister );
+	mov( EDX, dEDXRegister );
+	pop( dReturnAddress ); 			// this is the return address
+	pop( EAX );
+	mov( [EAX], iVariable );
+	pop( EBX );
+	mov( [EBX], jVariable );
+	// push back the return address
+	push( dReturnAddress );
+	// preserve registers
+	push( dEDXRegister );
+	push( dECXRegister );
+	push( dEBXRegister );
+	push( dEAXRegister );
+
+	// begin subtask
+	mov( iVariable, CX );
+	cmp( CX, jVariable );
+	jg iGreater;				// if ( *i > *j )
+	cmp( CX, jVariable );
+	jl jGreater;				// if ( *j > *i )
+
+	iGreater:
+		mov( iVariable, CX );
+		mov( CX, [EBX] );		// *j = *i;
+		jmp ExitSequence;
+	jGreater:
+		mov( jVariable, DX );
+		mov( DX, [EAX] );		// *i = *j;
+	ExitSequence:
+
+	// restore the registers used
+	pop( EAX );
+	pop( EBX );
+	pop( ECX );
+	pop( EDX );
+	ret();
+end makeBiggest;
+
+begin ReferenceProgram;
+	mov( 1, iValue1 );
+	mov( 7, iValue2 );
+	// push parameters to the function passing by reference
+	mov( &iValue1, EAX );
+	push( EAX );
+	mov( &iValue2, EAX );
+	push( EAX );
+
+	call makeBiggest;
+	stdout.put( "the first parameter = " );
+	stdout.put( iValue1 );
+	stdout.put( " the second parameter = " );
+	stdout.put( iValue2 );
+	stdout.newln();
+end ReferenceProgram;

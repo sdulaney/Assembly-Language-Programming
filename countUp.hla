@@ -1,0 +1,49 @@
+// File: countUp.hla
+// Stewart Dulaney
+// The purpose of this program is to display a repeated digit pattern based on n, a number inputted by the user
+// Input: a single int8 value
+// Output: digit pattern of the consecutive numbers from 1 up to the number inputted by the user, repeated for 2 up to that number and so on all the way up to that number
+
+program countUp;
+#include( "stdlib.hhf" );
+static
+	iDataValue : int8 := 0;
+	I : int8 := 0;
+	J : int8 := 0;
+
+begin countUp;
+	// Prompt the user
+	stdout.put( "Gimme a decimal value to use: " );
+	stdin.get( iDataValue );
+	stdout.put( "Here's your number: ");
+
+	ForLp1:
+	InitializeForLp1:	// I = 1
+		mov(1, I);
+	ForLp1TerminationTest:	// is I > iDataValue? then terminate for
+		mov(iDataValue, AL);
+		cmp(I, AL);
+		ja ForLp1Done;
+	ForLp1Body:
+		ForLp2:
+		InitializeForLp2:	// J = I
+			mov(I, AL);
+			mov(AL, J);
+		ForLp2TerminationTest:	// is J > iDataValue? then terminate for
+			mov(iDataValue, AL);
+			cmp(J, AL);
+			ja ForLp2Done;
+		ForLp2Body:
+			stdout.put(J);
+		ForLp2Increment:
+			inc(J);
+			jmp ForLp2TerminationTest;
+		ForLp2Done:
+	ForLp1Increment:
+		inc(I);
+		jmp ForLp1TerminationTest;
+	ForLp1Done:
+
+	stdout.put( nl );
+
+end countUp;

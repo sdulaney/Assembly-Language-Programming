@@ -1,0 +1,74 @@
+program notsetBitProgram;
+#include( "stdlib.hhf" );
+static
+	iValue: int16 := 0;
+	iShift: int16 := 0;
+	iAnswer : int32 := 0;
+
+procedure isBitNotSet( value : int16; shift : int16 );@nodisplay; @noframe;
+static
+	dReturnAddress : dword;
+	I : int16 := 0;
+	iRegisterValue : dword;
+
+begin isBitNotSet;
+	// entry sequence
+	// preserve registers used
+	mov( EBX, iRegisterValue );
+	pop( dReturnAddress );
+	// this is the return address
+	pop( shift );				// this is iShift
+	pop( value );				// this is iValue
+	// push back the return address
+	push( dReturnAddress );
+	// preserve registers
+	push( iRegisterValue );
+
+	// begin subtask
+	mov( 0, EAX );				// bool result = false;
+
+	ForLp1:
+	InitializeForLp1:			// I = 0
+		mov(0, I);
+	ForLp1TerminationTest:			// is I >= shift? then terminate for
+		mov(shift, AX);
+		cmp(I, AX);
+		jge ForLp1Done;
+	ForLp1Body:
+		shr( 1, value );		// shift once
+	ForLp1Increment:
+		inc(I);
+		jmp ForLp1TerminationTest;
+	ForLp1Done:
+
+	mov( 1, BX );				// prepare a bit string to use with the TEST instruction
+	test( BX, value );
+	setnz( AL );      			// result of AND tossed into zero flag
+	mov( 1, BL );
+	cmp( AL, BL );
+	je ReturnTrue;				// if ((value & 1) == 0) result = true;
+	jmp ExitSequence;
+
+	ReturnTrue:
+		mov( 1, EAX );
+		jmp ExitSequence;
+	ExitSequence:
+
+	// restore the registers used
+	pop( EBX );
+	// answer left in EAX
+	ret();
+end isBitNotSet;
+
+begin notsetBitProgram;
+	mov( 16, iValue);
+	mov( 0, iShift );
+	// push parameters to the function
+	push( iValue );
+	push( iShift );
+
+	call isBitNotSet;
+	mov( EAX, iAnswer );
+	stdout.put( iAnswer );
+	stdout.newln();
+end notsetBitProgram;

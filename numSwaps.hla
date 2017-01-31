@@ -1,0 +1,45 @@
+// File: numSwaps.hla
+// Stewart Dulaney
+// The purpose of this program is to prompt for values one-by-one until the user enters zero and keep track of the smallest number entered so far and how many times that smallest number changes as new numbers are encountered
+// Input: unspecified number of integers
+// Output: statement with number of swaps and smallest number entered
+
+program question19;
+	#include( "stdlib.hhf" );
+	static
+		current : int32;
+		nextNumber : int32;
+		swapCounter : int32 := 0;
+
+
+begin question19;
+	stdout.put( "Gimme data: " );
+	stdin.get( current );
+
+	DoWhileLp:
+	DoWhileLpBody:
+		stdout.put( "Gimme data: " );
+		stdin.get( nextNumber );
+		cmp( nextNumber, 0 ); // zero doesn't count as an entered number
+		je DoWhileLpDone; // then end loop
+		mov( current, EBX );
+		cmp( nextNumber, EBX );
+		jl DoStatement;
+	DoWhileLpTermination:
+		cmp( nextNumber, 0 ); // is nextNumber equal to 0
+		je DoWhileLpDone; // then end loop
+		jmp DoWhileLpBody; // continue looping
+	DoStatement:
+			mov( nextNumber, ECX );
+			mov( ECX, current );
+			mov( swapCounter, EDX );
+			add( 1, EDX );
+			mov( EDX, swapCounter );
+			jmp DoWhileLpTermination;
+	DoWhileLpDone:
+
+
+
+	stdout.put( "There were ", swapCounter, " swaps and the smallest number entered was ", current, ".", nl );
+
+end question19;

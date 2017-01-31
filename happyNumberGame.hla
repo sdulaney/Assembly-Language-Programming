@@ -1,0 +1,85 @@
+// File: happyNumberGame.hla
+// Stewart Dulaney
+// The purpose of this program is to implement a game in which the player wins when they enter the happy number. The game offers advice (higher or lower) and
+// continues as long as the same kind of advice is repetitively given.
+// Input: a happy number, then more numbers one-by-one for duration of game
+// Output: advice (higher or lower) to the player after each value they enter
+
+program happyNumberGame;
+#include( "stdlib.hhf" );
+static
+	iHappyNumber : int32 := 0;
+	iNumber : int32 := 0;
+	lastAdvice : int16;
+	currentAdvice : int16;
+
+begin happyNumberGame;
+
+	// Prompt the user
+	stdout.put( "Gimme the happy number: " );
+	stdin.get( iHappyNumber );
+	stdout.put( "Gimme a starting number: " );
+	stdin.get( iNumber );
+
+	mov( iNumber, EAX );
+	cmp( iHappyNumber, EAX );
+	je WonGame;
+	jb LowerAdvice;
+	ja HigherAdvice;
+
+	WonGame:
+		stdout.put( "You Won The Game!", nl );
+		jmp EndProgram;
+	LowerAdvice:
+		stdout.put( "Lower", nl );
+		mov( currentAdvice, AX );
+		mov( AX, lastAdvice );
+		mov( 0, currentAdvice );
+		jmp DoWhileLp;
+	HigherAdvice:
+		stdout.put( "Higher", nl );
+		mov( currentAdvice, AX );
+		mov( AX, lastAdvice );
+		mov( 1, currentAdvice );
+		jmp DoWhileLp;
+
+	DoWhileLp:
+	DoWhileLpBody:
+		stdout.put( "Next: " );
+		stdin.get( iNumber );
+		mov( iNumber, EAX );
+		cmp( iHappyNumber, EAX );
+		je WonGame2;
+		jb LowerAdvice2;
+		ja HigherAdvice2;
+	DoWhileLpTermination:
+		mov( lastAdvice, AX );
+		cmp( currentAdvice, AX ); 		// is the same kind of advice not repetitively given?
+		jne LostGame; 				// then end loop
+		jmp DoWhileLpBody; 			// continue looping
+	DoWhileLpDone:
+
+	WonGame2:
+		stdout.put( "You Won The Game!", nl );
+		jmp EndProgram;
+	LowerAdvice2:
+		mov( currentAdvice, lastAdvice );
+		mov( 0, currentAdvice );
+		mov( lastAdvice, AX );
+		cmp( currentAdvice, AX );
+		jne DoWhileLpTermination;
+		stdout.put( "Lower", nl );
+		jmp DoWhileLpTermination;
+	HigherAdvice2:
+		mov( currentAdvice, lastAdvice );
+		mov( 1, currentAdvice );
+		mov( lastAdvice, AX );
+		cmp( currentAdvice, AX );
+		jne DoWhileLpTermination;
+		stdout.put( "Higher", nl );
+		jmp DoWhileLpTermination;
+	LostGame:
+		stdout.put( "Sorry Charlie, You Lost The Game!", nl );
+	EndProgram:
+
+end happyNumberGame;

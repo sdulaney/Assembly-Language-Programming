@@ -1,0 +1,74 @@
+// File: rollingAverage.hla
+// Stewart Dulaney
+// The purpose of this program is to query for floating-point values and compute the rolling average of the numbers entered until the user quits
+// Input: floating-point values
+// Output: message displaying rolling average as a floating-point value
+
+program rollingAverage;
+#include( "stdlib.hhf" );
+static
+	iCount : real32 := 2;
+	iContinue : byte := 0;
+	iTotal : real32:= 0;
+	iAverage : real32:= 0;
+	iTemporary : real32;
+	iIncrement : real32 := 1;
+
+begin rollingAverage;
+
+	stdout.put( "Feed Me: " );
+	stdin.get( iTotal );
+
+	stdout.put( "Feed Me: " );
+	stdin.get( iTemporary );
+
+	// Add second input to total
+	finit();
+	fld( iTemporary );
+	fadd( iTotal );
+	fst( iTotal );
+	// Compute rolling average
+	fdiv( iCount );
+	fstp( iAverage );
+	stdout.put( "Rolling Average = " );
+	stdout.putr32( iAverage, 10, 1 );
+	stdout.put( nl );
+	stdout.put( "More Data? " );
+	stdin.flushInput();
+	stdin.getc();
+	mov( AL, iContinue );
+
+	WhileLp:
+	WhileLpTermination:
+		cmp( iContinue, %0111_1001 );		// is iContinue not equal to y?
+		jne WhileLpDone;      			// then end loop
+	WhileLpBody:
+		stdout.put( "Feed Me: " );
+		stdin.get( iTemporary );
+
+		finit();
+		fld( iIncrement );			// increment iCount
+		fadd( iCount );
+		fstp( iCount );
+		// Add input to total
+		fld( iTemporary );
+		fadd( iTotal );
+		fst( iTotal );
+		// Compute rolling average
+		fdiv( iCount );
+		fstp( iAverage );
+		stdout.put( "Rolling Average = " );
+		stdout.putr32( iAverage, 10, 1 );
+		stdout.put( nl );
+		stdout.put( "More Data? " );
+		stdin.flushInput();
+		stdin.getc();
+		mov( AL, iContinue );
+		jmp WhileLp;
+     	WhileLpDone:
+
+	stdout.put( "Final Rolling Average = " );
+	stdout.putr32( iAverage, 10, 1 );
+	stdout.put( nl );
+
+end rollingAverage;

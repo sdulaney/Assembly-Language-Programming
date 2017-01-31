@@ -1,0 +1,81 @@
+// File: recursiveDivisionFunction.hla
+// Stewart Dulaney
+// The purpose of this program is to return the value of a%b based on a recursive approach, assuming that a and b will be greater than or equal to zero
+// Input: two 32 bit integers, a and b, greater than or equal to zero
+// Output: value of a%b
+
+program recursiveDivisionFunction;
+#include( "stdlib.hhf" );
+static
+	iDataValue1 : int32 := 0;
+	iDataValue2 : int32 := 0;
+
+// Function recursiveModulo
+procedure recursiveModulo( a: int32; b : int32 ); @nodisplay; @noframe;
+static
+	returnAddress : dword;
+
+// This procedure returns its answer in EAX, so we don't need to save that register
+// No other register is used, so no other registers need to be saved
+begin recursiveModulo;
+// Get parameters from stack
+	pop(returnAddress);
+	pop(b);
+	pop(a);
+	push(returnAddress);
+
+	cmp(a, 0);			// if a = 0, return 0
+	je ReturnZero;
+
+	cmp(b, 0);			// if b = 0, return 0
+	je ReturnZero;
+
+	cmp(b, 1);			// if b = 1, return 0
+	je ReturnZero;
+
+	mov(b, EAX);			// if a < b, return a
+	cmp(a, EAX);
+	jl ReturnA;
+
+	jmp NoneOfThem;
+
+	ReturnZero:			// return 0
+		mov(0, EAX);
+		jmp ExitSequence;
+
+	ReturnA:			// return a
+		mov(a, EAX);
+		jmp ExitSequence;
+
+	NoneOfThem:
+		mov(b, EAX);
+		sub(EAX, a);		// a - b
+		push(a);
+		push(b);
+		call recursiveModulo;	// calling recursiveModulo(a - b)
+		jmp ExitSequence;
+
+	ExitSequence:
+	ret();
+
+end recursiveModulo;
+
+// Main program
+begin recursiveDivisionFunction;
+
+	stdout.put("Feed Me A: ");
+	stdin.get(iDataValue1);
+	push(iDataValue1);
+
+	stdout.put("Feed Me B: ");
+	stdin.get(iDataValue2);
+	push(iDataValue2);
+
+	call recursiveModulo;
+	// this function leaves the answer in EAX
+
+	stdout.put("RecursiveModulo of A%B = ");
+	stdout.puti32(EAX);
+	stdout.newln();
+
+end recursiveDivisionFunction;

@@ -1,0 +1,28 @@
+// File: MPHConversion.hla
+// Stewart Dulaney
+// The purpose of this program is to convert kilometers per hour to miles per hour
+// Input: Kilometer per hour amount
+// Output: Mile per hour amount
+
+program FPUSample;
+#include( "stdlib.hhf" );
+static
+    x : real32;
+    y : real32:= 0.621;
+    z : real32;
+begin FPUSample;
+  stdout.put ("Km per hour : ");
+  stdin.get( x );
+
+  // Compute Y := x*y;
+  finit();
+  fld( x );              // Load X.
+  fld( y );            // Load Y on TOS.
+  fmul();                // Compute X*Y.
+  fstp( z );             // Store result away into Z.
+
+  stdout.put( "Here's your Miles per hour: " );
+  stdout.putr32( z, 10, 3);
+  stdout.put( nl );
+
+end FPUSample;

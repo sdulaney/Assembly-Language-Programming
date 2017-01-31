@@ -1,0 +1,81 @@
+// File: strlenFunction.hla
+// Stewart Dulaney
+// The purpose of this program is to implement a function that returns in AL the number of characters in the string parameter, passed by its base address
+// Input: string
+// Output: message displaying length of the string
+
+program strlenFunction;
+#include( "stdlib.hhf" );
+#include( "string.hla" );
+const
+	nullchar : byte := 0;
+static
+	stringData : byte[27] := [ 'a', 'b', 'c', 'a', 'b', 'c', 'a', 'b', 'c', 'a', 'b', 'c', 'a', 'b', 'c', 'a', 'b', 'c', 'a', 'b', 'c', 'a', 'b', 'c', 'a', 'b', '0' ];
+	stringDataLen : uns16 := 26; 			// max number of chars string can hold NOT including the NULL
+	iLength: int8 := 0;
+
+// Procedure strlen
+procedure strlen( baseStringAddress: dword ); @nodisplay; @noframe;
+static
+	iSize: int8 := 0; 				// the number of string characters
+	dStringAddress : dword := 0; 			// holds base address
+	iReturnAddress : dword;
+
+begin strlen;
+	// entry sequence
+	pop( iReturnAddress );
+	// acquire parameters on the stack
+	pop( dStringAddress );
+	push( iReturnAddress );
+	// preserve registers
+	push( EBX );
+	push( EDX );
+
+	mov( dStringAddress, EBX ); 			// EBX is address of A[i]
+
+	WhileLp:
+	WhileLpTermination:
+		mov( (type char [EBX]), DL );
+		cmp( DL, nullchar );
+		je WhileLpDone;      			// then end loop
+	WhileLpBody:
+		inc( EBX );             		// increment EBX
+		inc( iSize );             		// increment iSize
+		jmp WhileLp;
+     	WhileLpDone:
+
+	mov( iSize, AL );
+	pop( EDX );
+	pop( EBX );
+	ret();
+end strlen;
+
+
+
+
+// Main program
+begin strlenFunction;
+
+	stdout.put( "Feed Me: " );
+	// Read input string
+	mov( &stringData, EAX );
+	push( EAX );
+	push( stringDataLen );
+	call gets;
+
+
+	stdout.put( "The String You Entered: " );
+	// Write input string
+	mov( &stringData, EAX );
+	push( EAX );
+	call puts;
+	stdout.put( " Has Length = " );
+	// Call strlen
+	mov( &stringData, EAX );
+	push( EAX );
+	call strlen;
+	mov( AL, iLength );
+	stdout.put( iLength );
+	stdout.newln();
+
+end strlenFunction;

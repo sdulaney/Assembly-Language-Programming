@@ -1,0 +1,129 @@
+// File: swapperProgram.hla
+// Stewart Dulaney
+// The purpose of this program is to implement a function which correctly sorts three parameters and returns a boolean value in AL which should be set to true if any swaps were performed to sort the sequence in increasing order
+// Input: three integers
+// Output: message displaying the integers in increasing order
+
+program swapperProgram;
+#include( "stdlib.hhf" );
+#include( "string.hla" );
+static
+	iValueX : int16 := 0;
+	iValueY : int16 := 0;
+	iValueZ : int16 := 0;
+
+procedure swapper( var x : int16; var y : int16; var z : int16 ); @nodisplay; @noframe;
+static
+	dReturnAddress : dword;
+	iTemporary : int16;
+	iTemp1 : int16;
+	dESIRegister : dword := 0; // preserve ESI
+	dEDXRegister : dword := 0; // preserve EDX
+	dECXRegister : dword := 0; // preserve ECX
+	dEBXRegister : dword := 0; // preserve EBX
+
+begin swapper;
+	// entry sequence
+	// preserve registers
+	mov( EBX, dEBXRegister );
+	mov( ECX, dECXRegister );
+	mov( EDX, dEDXRegister );
+	mov( ESI, dESIRegister );
+	pop( dReturnAddress );
+	pop( EDX );				// this is the address of z
+	pop( ECX );				// this is the address of y
+	pop( EBX );				// this is the address of x
+	push( dReturnAddress );
+	// preserve registers
+	push( dESIRegister );
+	push( dEDXRegister );
+	push( dECXRegister );
+	push( dEBXRegister );
+
+	mov( 0, AL );
+
+	// Find the smallest parameter and swap it into first position
+	mov( [EBX], iTemp1 );
+	mov( [ECX], SI );
+	cmp( iTemp1, SI );			// if( x < y )
+	jg XgeY;
+	mov( [EBX], iTemp1 );
+	mov( [EDX], SI );
+	cmp( iTemp1, SI );			// { if( z < x ) swap(x,z); }
+	jg SwapXZ;
+	jmp CompareYZ;
+	XgeY:					// else
+		mov( [ECX], iTemp1 );
+		mov( [EDX], SI );
+		cmp( iTemp1, SI );		// { if( y < z ) swap(x,y);
+		jl SwapXY;
+		mov( [ECX], iTemp1 );
+		mov( [EDX], SI );
+		cmp( iTemp1, SI );
+		jg SwapXZ;			// else swap(x,z); }
+		jmp CompareYZ;
+
+	// Compare the remaining two and swap if necessary
+	CompareYZ:
+		mov( [ECX], iTemp1 );
+		mov( [EDX], SI );
+		cmp( iTemp1, SI );		// if( z < y ) swap(y,z);
+		jg SwapYZ;
+		jmp EndProgram;
+
+	SwapXY:
+		mov( [EBX], ESI ); 		// ESI = x
+		mov( SI, iTemporary ); 		// temporary = x
+		mov( [ECX], ESI ); 		// ESI = y
+		mov( SI, [EBX] ); 		// x = y
+		mov( iTemporary, SI ); 		// ESI = x
+		mov( SI, [ECX] ); 		// y = temporary
+		mov( 1, AL );
+		jmp CompareYZ;
+	SwapXZ:
+		mov( [EBX], ESI ); 		// ESI = x
+		mov( SI, iTemporary ); 		// temporary = x
+		mov( [EDX], ESI ); 		// ESI = z
+		mov( SI, [EBX] ); 		// x = z
+		mov( iTemporary, SI ); 		// ESI = x
+		mov( SI, [EDX] ); 		// z = temporary
+		mov( 1, AL );
+		jmp CompareYZ;
+	SwapYZ:
+		mov( [ECX], ESI ); 		// ESI = y
+		mov( SI, iTemporary ); 		// temporary = y
+		mov( [EDX], ESI ); 		// ESI = z
+		mov( SI, [ECX] ); 		// y = z
+		mov( iTemporary, SI ); 		// ESI = y
+		mov( SI, [EDX] ); 		// z = temporary
+		mov( 1, AL );
+		jmp EndProgram;
+	EndProgram:
+
+
+	pop( EBX );
+	pop( ECX );
+	pop( EDX );
+	pop( ESI );
+	ret();
+end swapper;
+
+begin swapperProgram;
+
+	stdout.put( "Gimme X: " );
+	stdin.get( iValueX );
+	stdout.put( "Gimme Y: " );
+	stdin.get( iValueY );
+	stdout.put( "Gimme Z: " );
+	stdin.get( iValueZ );
+	lea( EAX, iValueX ); 			// get address of iValueX
+	push( EAX );
+	lea( EAX, iValueY ); 			// get address of iValueY
+	push( EAX );
+	lea( EAX, iValueZ ); 			// get address of iValueZ
+	push( EAX );
+
+	call swapper;
+	stdout.put( "After sorting, X = ", iValueX, ", Y = ", iValueY, ", Z = ", iValueZ, nl );
+
+end swapperProgram;

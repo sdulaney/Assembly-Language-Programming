@@ -1,0 +1,47 @@
+// File: numberPattern.hla
+// Stewart Dulaney
+// The purpose of this program is to print a repetitive pattern based on a single user input value
+// Input: single decimal value
+// Output: repetitive digit pattern
+
+program question20;
+#include( "stdlib.hhf" );
+static
+	iDataValue : int8 := 0;
+	I : int8 := 0;
+	J : int8 := 0;
+
+begin question20;
+	// Prompt the user
+	stdout.put( "Feed Me: " );
+	stdin.get( iDataValue );
+
+	ForLp1:
+	InitializeForLp1:			// I = 1
+		mov(1, I);
+	ForLp1TerminationTest:			// is I > iDataValue? then terminate for
+		mov(iDataValue, AL);
+		cmp(I, AL);
+		ja ForLp1Done;
+	ForLp1Body:
+		ForLp2:
+		InitializeForLp2:		// J = 1
+			mov(1, J);
+		ForLp2TerminationTest:		// is J > I? then terminate for
+			mov(I, AL);
+			cmp(J, AL);
+			ja ForLp2Done;
+		ForLp2Body:
+			stdout.put(I);
+		ForLp2Increment:
+			inc(J);
+			jmp ForLp2TerminationTest;
+		ForLp2Done:
+	ForLp1Increment:
+		inc(I);
+		jmp ForLp1TerminationTest;
+	ForLp1Done:
+
+	stdout.put( nl );
+
+end question20;
